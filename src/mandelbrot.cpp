@@ -10,12 +10,13 @@ GfxErr_t MandelbrotDraw(AppCtx_t* app)
     for (int pixel_y = 0; pixel_y < SCREEN_HEIGHT; pixel_y++)
     {
         float coord_y_start = 0.15 + COORD_Y_SHIFT + COORD_Y_STEP_COEFF * ((float) pixel_y / SCREEN_HEIGHT);
+        float coord_x_start = -0.4 + COORD_X_SHIFT;
+        float coord_x_inc   = (float) COORD_X_STEP_COEFF / SCREEN_WIDTH;
         
-        for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x++)
+        for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x++, coord_x_start += coord_x_inc)
         {
-            float coord_x_start = -0.4 + COORD_X_SHIFT + COORD_X_STEP_COEFF * ((float) pixel_x / SCREEN_WIDTH),
-                  coord_x       = coord_x_start,
-                  coord_y       = coord_y_start;
+            float coord_x = coord_x_start,
+                  coord_y = coord_y_start;
 
             int iters = 0;
 
