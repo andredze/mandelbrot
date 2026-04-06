@@ -1,6 +1,4 @@
-CXX = g++
-
-CXXFLAGS = -D _DEBUG -ggdb3 -std=c++17 -Wall -Wextra -Weffc++ -Wsign-conversion 			 	 \
+DED_FLAGS = -D _DEBUG -ggdb3 -std=c++17 -Wall -Wextra -Weffc++ -Wsign-conversion 			 	 \
 		   -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations 		   		 \
 		   -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported  		   		 \
 		    -Wctor-dtor-privacy -Wempty-body -Wfloat-equal -Wformat-nonliteral 		 			 \
@@ -15,14 +13,16 @@ CXXFLAGS = -D _DEBUG -ggdb3 -std=c++17 -Wall -Wextra -Weffc++ -Wsign-conversion 
 		   -fstack-protector -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer 	 \
 		   -Wlarger-than=8192 -Wstack-usage=8192 -pie -fPIE -Werror=vla -Wconversion
 
-CXXFLAGS += -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,$\
-			float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,$\
-			null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,$\
-			undefined,unreachable,vla-bound,vptr
-
-CXXFLAGS += -mavx
+ASAN = -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,$\
+	    float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,$\
+	    null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,$\
+	    undefined,unreachable,vla-bound,vptr
 
 # ——————————————————————————————————————————————————————————————————————————————————————————
+
+CXX = g++
+
+CXXFLAGS = -march=native
 
 INCLUDES += -I include
 
@@ -31,11 +31,17 @@ SOURCES = src/main.cpp	 		\
 		  src/mandelbrot.cpp
 
 ifdef DEBUG
-	CXXFLAGS += -D DEBUG
+	CXXFLAGS += -D DEBUG $(DED_FLAGS) $(ASAN)
 endif
 
 ifdef WITH_O3
 	CXXFLAGS += -O3
+else
+	CXXFLAGS += -O2
+endif
+
+ifdef GRAPHICS
+	CXXFLAGS += -D GRAPHICS
 endif
 
 OBJS = $(SOURCES:src/%.cpp=obj/%.o)

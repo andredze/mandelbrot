@@ -3,33 +3,6 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-static GfxErr_t GfxRendererInit(AppCtx_t* app)
-{
-    assert(app);
-
-    app->renderer = SDL_CreateRenderer(app->window, -1, SDL_RENDERER_ACCELERATED);
-
-    if (app->renderer == NULL)
-    {
-        PRINTERR("Failed to create renderer. SDL_Error: %s", SDL_GetError());
-
-        return GFX_SDL_RENDERER_ERROR;
-    }
-    
-    if (SDL_RenderSetScale(app->renderer,
-                           SCALE_SCREEN_WIDTH,
-                           SCALE_SCREEN_HEIGHT) < 0)
-    {
-        PRINTERR("Failed to set scale for renderer. SDL_Error: %s", SDL_GetError());
-    
-        return GFX_SDL_RENDERER_ERROR;
-    }
-
-    return GFX_SUCCESS;
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————
-
 GfxErr_t GfxCtor(AppCtx_t* app)
 {
     assert(app);
@@ -62,16 +35,14 @@ GfxErr_t GfxCtor(AppCtx_t* app)
 
     //------------------------------------------------------------------//
 
-    GfxErr_t error = GFX_SUCCESS;
+    app->screen_surface = SDL_GetWindowSurface(app->window);
 
-    if ((error = GfxRendererInit(app)))
+    if (app->screen_surface == NULL)
     {
-        return error;
+        PRINTERR("Failed getting window surface. SDL_Error: %s", SDL_GetError());
+
+        return GFX_SURFACE_ERROR;
     }
-
-    //------------------------------------------------------------------//
-
-    // app->screen_surface = SDL_GetWindowSurface(app->window);
 
     //------------------------------------------------------------------//
 
@@ -106,31 +77,69 @@ GfxErr_t GfxUpdate(AppCtx_t* app)
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+GfxErr_t GfxPutPixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
+{
+    assert(surface);
+
+    int bpp = surface->format->BytesPerPixel;
+
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+    
+    switch (bpp) 
+    {
+        case 1:
+            *p = pixel;
+            break;
+
+        case 2:
+            *(Uint16 *)p = pixel;
+            break;
+
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN) 
+            {
+                p[0] = (pixel >> 16) & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = pixel & 0xff;
+            } 
+            else 
+            {
+                p[0] = pixel & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = (pixel >> 16) & 0xff;
+            }
+
+            break;
+
+        case 4:
+            *(Uint32 *)p = pixel;
+            break;
+        
+        default:
+            break;
+    }
+
+    return GFX_SUCCESS;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 GfxErr_t GfxDraw(AppCtx_t* app)
 {
     assert(app);
 
-    if (SDL_SetRenderDrawColor(app->renderer,
-                               SDL_COLOR_RESET.r,
-                               SDL_COLOR_RESET.g,
-                               SDL_COLOR_RESET.b,
-                               SDL_COLOR_RESET.a) < 0)
-    {
-        PRINTERR("Failed to set color for renderer. SDL_Error: %s", SDL_GetError());
-    
-        return GFX_SDL_RENDERER_ERROR;
-    }
-
-    SDL_RenderClear(app->renderer);
-
     GfxErr_t error = GFX_SUCCESS;
 
+    SDL_LockSurface(app->screen_surface);
+    
     if ((error = MandelbrotDrawIntrinsics(app)))
     {
         return error;
     }
 
-    SDL_RenderPresent(app->renderer);
+    SDL_UnlockSurface(app->screen_surface);
+    
+    SDL_UpdateWindowSurface(app->window);
 
     return GFX_SUCCESS;
 }
@@ -141,11 +150,8 @@ void GfxDtor(AppCtx_t* app)
 {
     assert(app);
 
-    // SDL_FreeSurface(app->screen_surface);
-    // app->screen_surface = NULL;
-
-    SDL_DestroyRenderer(app->renderer);
-    app->renderer = NULL;
+    SDL_FreeSurface(app->screen_surface);
+    app->screen_surface = NULL;
 
     SDL_DestroyWindow(app->window);
     app->window = NULL;

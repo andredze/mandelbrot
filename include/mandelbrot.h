@@ -22,6 +22,23 @@ const float COORD_X_STEP_COEFF = 4.0f;
 
 //------------------------------------------------------------------//
 
+const float COORD_X_DIFF = COORD_X_STEP_COEFF / SCREEN_WIDTH;
+const float COORD_Y_DIFF = COORD_Y_STEP_COEFF / SCREEN_HEIGHT;
+
+alignas(32) const float MM_COORD_X_START[MM_SIZE] = 
+{   
+    COORD_X_SHIFT + 0 * COORD_X_DIFF,
+    COORD_X_SHIFT + 1 * COORD_X_DIFF,
+    COORD_X_SHIFT + 2 * COORD_X_DIFF,
+    COORD_X_SHIFT + 3 * COORD_X_DIFF,
+    COORD_X_SHIFT + 4 * COORD_X_DIFF,
+    COORD_X_SHIFT + 5 * COORD_X_DIFF,
+    COORD_X_SHIFT + 6 * COORD_X_DIFF,
+    COORD_X_SHIFT + 7 * COORD_X_DIFF
+};
+
+//------------------------------------------------------------------//
+
 const float MM_76543210[MM_SIZE] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
 const float MM_NUMBER_2[MM_SIZE] = {2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f};
 

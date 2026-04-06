@@ -13,13 +13,13 @@
 
 //------------------------------------------------------------------//
 
-const int SCALE_SCREEN_WIDTH  = 2;
-const int SCALE_SCREEN_HEIGHT = 2;
+const int SCALE_SCREEN_WIDTH  = 1;
+const int SCALE_SCREEN_HEIGHT = 1;
 
 //------------------------------------------------------------------//
 
-const int SCREEN_WIDTH  = 1280;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_WIDTH  = 1280 * 2;
+const int SCREEN_HEIGHT = 800 * 2;
 
 //------------------------------------------------------------------//
 
@@ -44,6 +44,7 @@ typedef enum GfxErr
     GFX_WINDOW_ERROR,
     GFX_SDL_RENDERER_ERROR,
     GFX_FONT_INIT_ERROR,
+    GFX_SURFACE_ERROR
 }
 GfxErr_t;
 
@@ -63,6 +64,8 @@ typedef struct AppCtx
 AppCtx_t;
 
 //------------------------------------------------------------------//
+
+GfxErr_t GfxPutPixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
 
 GfxErr_t GfxCtor    (AppCtx_t* app);
 GfxErr_t GfxUpdate  (AppCtx_t* app);

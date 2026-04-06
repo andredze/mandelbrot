@@ -1,5 +1,6 @@
 #include "mandelbrot.h"
 #include "math.h"
+#include "graphics.h"
 #include <avxintrin.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -194,19 +195,6 @@ MM_Cpy(      float mm_dest[MM_SIZE],
 
 //------------------------------------------------------------------//
 
-const float COORD_X_DIFF = (float) COORD_X_STEP_COEFF / SCREEN_WIDTH;
-
-const float MM_COORD_X_START[MM_SIZE] = {COORD_X_SHIFT + 0 * COORD_X_DIFF,
-                                         COORD_X_SHIFT + 1 * COORD_X_DIFF,
-                                         COORD_X_SHIFT + 2 * COORD_X_DIFF,
-                                         COORD_X_SHIFT + 3 * COORD_X_DIFF,
-                                         COORD_X_SHIFT + 4 * COORD_X_DIFF,
-                                         COORD_X_SHIFT + 5 * COORD_X_DIFF,
-                                         COORD_X_SHIFT + 6 * COORD_X_DIFF,
-                                         COORD_X_SHIFT + 7 * COORD_X_DIFF};
-
-//------------------------------------------------------------------//
-
 GfxErr_t MandelbrotDrawUnrolledWithFunctions(AppCtx_t* app)
 {
     assert(app);
@@ -290,75 +278,92 @@ GfxErr_t MandelbrotDrawUnrolledWithFunctions(AppCtx_t* app)
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+static inline Uint32 MandelbrotGetColor(SDL_PixelFormat* format, int iters)
+{
+    Uint8 color_r = 0;
+    Uint8 color_g = 0;
+    Uint8 color_b = 0;
+
+    if (iters < MANDELBROT_MAX_ITERS)
+    {
+        float clr = 255 * sqrt(sqrt( (float) iters / MANDELBROT_MAX_ITERS));
+        
+        color_r = (Uint8) clr;
+        color_g = (Uint8) (255 - 50 * (iters % 40));
+        color_b = 205;
+    }
+
+    return SDL_MapRGB(format, color_r, color_g, color_b);
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 GfxErr_t MandelbrotDrawIntrinsics(AppCtx_t* app)
 {
     assert(app);
 
+    __m256  mm_number_2f     = _mm256_set1_ps(2.0f);
+    __m256  mm_x_increment   = _mm256_set1_ps(COORD_X_DIFF * MM_SIZE);
+    __m256  mm_r_squared_max = _mm256_set1_ps(STABLE_POINTS_CIRCLE_RADIUS_SQUARED);
+
     for (int pixel_y = 0; pixel_y < SCREEN_HEIGHT; pixel_y++)
     {
-        __m256 coord_y_start     = _mm256_set1_ps(COORD_Y_SHIFT + COORD_Y_STEP_COEFF * ((float) pixel_y / SCREEN_HEIGHT));
-        __m256 coord_x_start     = _mm256_load_ps(MM_COORD_X_START);
-        __m256 coord_x_increment = _mm256_set1_ps(COORD_X_DIFF * MM_SIZE);
+        __m256 mm_x_start = _mm256_load_ps(MM_COORD_X_START);
+        __m256 mm_y_start = _mm256_set1_ps(COORD_Y_SHIFT + (float) pixel_y * COORD_Y_DIFF);
         
         for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x += MM_SIZE)
         {
-            __m256 coord_x = _mm256_setzero_ps();
-            __m256 coord_y = _mm256_setzero_ps();
+            __m256 mm_x = mm_x_start;
+            __m256 mm_y = mm_y_start;
 
-            coord_x = _mm256_add_ps(coord_x, coord_x_start);
-            coord_y = _mm256_add_ps(coord_y, coord_y_start);
-            
-            int iters      [MM_SIZE] = {0};
-            int is_unstable[MM_SIZE] = {0};
+            __m256i mm_iters = _mm256_setzero_si256();
 
-            for (;;)
+            for (int n = 0; n < MANDELBROT_MAX_ITERS; n++)
             {
-                int is_all_unstable = 1;
+                __m256 mm_x_squared = _mm256_mul_ps(mm_x, mm_x);
+                __m256 mm_y_squared = _mm256_mul_ps(mm_y, mm_y);
+                __m256 mm_r_squared = _mm256_add_ps(mm_x_squared, mm_y_squared);
 
-                for (int i = 0; i < MM_SIZE; i++) { is_all_unstable *= is_unstable[i]; }
+                // if (r[i]^2 <= max_r[i]^2) { mask[i] = -1 }
+                __m256 mm_is_stable_mask = _mm256_cmp_ps(mm_r_squared, mm_r_squared_max, _CMP_LE_OQ);
 
-                if (is_all_unstable) { break; }
-            
-                __m256 coord_x_squared = _mm256_mul_ps(coord_x, coord_x);
-                __m256 coord_y_squared = _mm256_mul_ps(coord_y, coord_y);
-                __m256 radius_vector_squared = _mm256_add_ps(coord_x_squared, coord_y_squared);
-                
-                for (int i = 0; i < MM_SIZE; i++) { if (radius_vector_squared[i] > STABLE_POINTS_CIRCLE_RADIUS_SQUARED) { is_unstable[i] = 1; } }
-                
-                __m256 mm_number_2 = _mm256_set1_ps(2.0f);
+                int is_stable_mask = _mm256_movemask_ps(mm_is_stable_mask);
 
-                coord_y = _mm256_mul_ps(coord_y, mm_number_2);
-                coord_y = _mm256_mul_ps(coord_y, coord_x);
-                coord_y = _mm256_add_ps(coord_y, coord_y_start);
+                // if all points are unstable (outside the circle)
+                if (is_stable_mask == 0)
+                {
+                    break;
+                }
+
+                // y = 2 * y * x + y_0
+                mm_y = _mm256_fmadd_ps(_mm256_mul_ps(mm_number_2f, mm_y), mm_x, mm_y_start);
                 
-                coord_x = _mm256_sub_ps(coord_x_squared, coord_y_squared);
-                coord_x = _mm256_add_ps(coord_x, coord_x_start);
+                // x = (x^2) - (y^2) + x_0
+                mm_x = _mm256_add_ps(_mm256_sub_ps(mm_x_squared, mm_y_squared), mm_x_start);
                 
-                for (int i = 0; i < MM_SIZE; i++) { if (!is_unstable[i]) { iters[i] += 1; } if (iters[i] >= MANDELBROT_MAX_ITERS) { is_unstable[i] = 1; }}
+                // // if   (mask == -1) { iters++    <=> iters - mask }
+                // // else (mask ==  0) { do nothing <=> iters - mask }
+                mm_iters = _mm256_sub_epi32(mm_iters, _mm256_castps_si256(mm_is_stable_mask));
             }
             
-            DPRINTF("Drawing points: ");
-            
+            // convert __m256i to integer array through memory
+            // mem_addr must be aligned on a 32-byte boundary
+            alignas(32) int iters[MM_SIZE] = {};
+
+            _mm256_store_si256( (__m256i*) iters, mm_iters);
+
             for (int i = 0; i < MM_SIZE; i++)
             {
-                if (iters[i] == MANDELBROT_MAX_ITERS)
-                {
-                    SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
-                }
-                else
-                {
-                    float clr = sqrt(sqrt(iters[i] / MANDELBROT_MAX_ITERS));
-                    SDL_SetRenderDrawColor(app->renderer, 255 * (clr+0.25), 255 - 50 * (iters[i] % 40), 205 - iters[i] * clr, 255);
-                }
-
-                SDL_RenderDrawPoint(app->renderer, pixel_x + i, pixel_y);
+                Uint32 pixel_color = MandelbrotGetColor(app->screen_surface->format, iters[i]);
+                
+                GfxPutPixel(app->screen_surface, pixel_x + i, pixel_y, pixel_color);
 
                 DPRINTF("%d %d %d\t", pixel_x + i, pixel_y, iters[i]);
             }
 
             DPRINTF("\n");
 
-            coord_x_start = _mm256_add_ps(coord_x_start, coord_x_increment);
+            mm_x_start = _mm256_add_ps(mm_x_start, mm_x_increment);
         }
     }
 
