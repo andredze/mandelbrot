@@ -125,7 +125,7 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 
     GfxErr_t error = GFX_SUCCESS;
 
-    if ((error = MandelbrotDraw(app)))
+    if ((error = MandelbrotDrawIntrinsics(app)))
     {
         return error;
     }

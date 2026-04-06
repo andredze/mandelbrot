@@ -20,6 +20,8 @@ CXXFLAGS += -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,$\
 			null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,$\
 			undefined,unreachable,vla-bound,vptr
 
+CXXFLAGS += -mavx
+
 # ——————————————————————————————————————————————————————————————————————————————————————————
 
 INCLUDES += -I include
@@ -28,9 +30,12 @@ SOURCES = src/main.cpp	 		\
 		  src/graphics.cpp 		\
 		  src/mandelbrot.cpp
 
-
 ifdef DEBUG
 	CXXFLAGS += -D DEBUG
+endif
+
+ifdef WITH_O3
+	CXXFLAGS += -O3
 endif
 
 OBJS = $(SOURCES:src/%.cpp=obj/%.o)
