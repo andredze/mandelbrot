@@ -55,6 +55,14 @@ GfxErr_t GfxCtor(AppCtx_t* app)
 
     //------------------------------------------------------------------//
 
+    app->mm_x_key_shift = _mm256_setzero_ps();
+    app->mm_y_key_shift = _mm256_setzero_ps();
+
+    app->x_zoom_span = 1;
+    app->y_zoom_span = 1;
+
+    //------------------------------------------------------------------//
+
     return GFX_SUCCESS;    
 }
 
@@ -70,6 +78,35 @@ GfxErr_t GfxUpdate(AppCtx_t* app)
         {
             app->is_running = false;
         }
+    }
+
+    const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
+
+    if (current_key_states[SDL_SCANCODE_UP])
+    {
+        app->mm_y_key_shift = _mm256_sub_ps(app->mm_y_key_shift, _mm256_set1_ps(MM_COORD_Y_KEY_STEP));
+    }
+    if (current_key_states[SDL_SCANCODE_DOWN])
+    {
+        app->mm_y_key_shift = _mm256_add_ps(app->mm_y_key_shift, _mm256_set1_ps(MM_COORD_Y_KEY_STEP));
+    }
+    if (current_key_states[SDL_SCANCODE_LEFT])
+    {
+        app->mm_x_key_shift = _mm256_sub_ps(app->mm_x_key_shift, _mm256_set1_ps(MM_COORD_X_KEY_STEP));
+    }
+    if (current_key_states[SDL_SCANCODE_RIGHT])
+    {
+        app->mm_x_key_shift = _mm256_add_ps(app->mm_x_key_shift, _mm256_set1_ps(MM_COORD_X_KEY_STEP));
+    }
+    if (current_key_states[SDL_SCANCODE_SPACE])
+    {
+        app->x_zoom_span -= 0.1f;
+        app->y_zoom_span -= 0.1f;
+    }
+    if (current_key_states[SDL_SCANCODE_RSHIFT])
+    {
+        app->x_zoom_span += 0.1f;
+        app->y_zoom_span += 0.1f;
     }
 
     return GFX_SUCCESS;
@@ -127,6 +164,15 @@ GfxErr_t GfxPutPixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
 GfxErr_t GfxDraw(AppCtx_t* app)
 {
     assert(app);
+
+    Uint32 black_color = SDL_MapRGB(app->screen_surface->format, 0, 0, 0);
+
+    SDL_Rect screen_rect = {.x = 0,
+                            .y = 0,
+                            .w = SCREEN_WIDTH,
+                            .h = SCREEN_HEIGHT};
+
+    SDL_FillRect(app->screen_surface, &screen_rect, black_color);
 
     GfxErr_t error = GFX_SUCCESS;
 

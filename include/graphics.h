@@ -10,6 +10,12 @@
 
 #include <assert.h>
 #include "my_printfs.h"
+#include <avxintrin.h>
+
+//------------------------------------------------------------------//
+
+alignas (32) const float MM_COORD_X_KEY_STEP = 0.1f;
+alignas (32) const float MM_COORD_Y_KEY_STEP = 0.1f;
 
 //------------------------------------------------------------------//
 
@@ -18,8 +24,8 @@ const int SCALE_SCREEN_HEIGHT = 1;
 
 //------------------------------------------------------------------//
 
-const int SCREEN_WIDTH  = 1280 * 2;
-const int SCREEN_HEIGHT = 800 * 2;
+const int SCREEN_WIDTH  = 1280 * 4;
+const int SCREEN_HEIGHT = 800 * 4;
 
 //------------------------------------------------------------------//
 
@@ -58,6 +64,12 @@ typedef struct AppCtx
     SDL_Renderer*   renderer;
     SDL_Window*     window;
     SDL_Surface*    screen_surface;
+
+    __m256          mm_x_key_shift;
+    __m256          mm_y_key_shift;
+
+    float           x_zoom_span;
+    float           y_zoom_span;
 
     TTF_Font*       font;
 }

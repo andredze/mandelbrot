@@ -302,14 +302,14 @@ GfxErr_t MandelbrotDrawIntrinsics(AppCtx_t* app)
 {
     assert(app);
 
-    __m256  mm_number_2f     = _mm256_set1_ps(2.0f);
-    __m256  mm_x_increment   = _mm256_set1_ps(COORD_X_DIFF * MM_SIZE);
-    __m256  mm_r_squared_max = _mm256_set1_ps(STABLE_POINTS_CIRCLE_RADIUS_SQUARED);
+    __m256 mm_number_2f     = _mm256_set1_ps(2.0f);
+    __m256 mm_x_increment   = _mm256_set1_ps(COORD_X_DIFF * MM_SIZE * app->x_zoom_span);
+    __m256 mm_r_squared_max = _mm256_set1_ps(STABLE_POINTS_CIRCLE_RADIUS_SQUARED);
 
     for (int pixel_y = 0; pixel_y < SCREEN_HEIGHT; pixel_y++)
     {
-        __m256 mm_x_start = _mm256_load_ps(MM_COORD_X_START);
-        __m256 mm_y_start = _mm256_set1_ps(COORD_Y_SHIFT + (float) pixel_y * COORD_Y_DIFF);
+        __m256 mm_x_start = _mm256_add_ps(_mm256_load_ps(MM_COORD_X_START), app->mm_x_key_shift); 
+        __m256 mm_y_start = _mm256_add_ps(_mm256_set1_ps(COORD_Y_SHIFT + (float) pixel_y * COORD_Y_DIFF * app->x_zoom_span), app->mm_y_key_shift);
         
         for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x += MM_SIZE)
         {
