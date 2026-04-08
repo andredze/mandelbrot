@@ -22,17 +22,34 @@ ASAN = -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,$\
 
 CXX = g++
 
-CXXFLAGS = -march=native
+CXXFLAGS = -march=native -g -fno-omit-frame-pointer
 
 INCLUDES += -I include
 
-SOURCES = src/main.cpp	 		\
-		  src/graphics.cpp 		\
-		  src/mandelbrot.cpp
+SOURCES = src/main.cpp	 		  \
+		  src/graphics.cpp 		  \
+		  src/mandelbrot.cpp	  \
+		  src/mandelbrot_test.cpp \
+
+# ------------------------------------------------------------------ #
 
 ifdef DEBUG
 	CXXFLAGS += -D DEBUG $(DED_FLAGS) $(ASAN)
+else
+	CXXFLAGS += -DNDEBUG
 endif
+
+# ------------------------------------------------------------------ #
+
+ifdef TEST_AVX
+	CXXFLAGS += -D _TEST_AVX
+else ifdef TEST_UNOPTIMIZED
+	CXXFLAGS += -D _TEST_UNOPTIMIZED
+else ifdef TEST_ARRAYS
+	CXXFLAGS += -D _TEST_ARRAYS
+endif
+
+# ------------------------------------------------------------------ #
 
 ifdef WITH_O3
 	CXXFLAGS += -O3
@@ -40,9 +57,13 @@ else
 	CXXFLAGS += -O2
 endif
 
+# ------------------------------------------------------------------ #
+
 ifdef GRAPHICS
 	CXXFLAGS += -D GRAPHICS
 endif
+
+# ------------------------------------------------------------------ #
 
 OBJS = $(SOURCES:src/%.cpp=obj/%.o)
 

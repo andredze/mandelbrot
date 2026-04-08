@@ -44,7 +44,7 @@ const float MM_NUMBER_2[MM_SIZE] = {2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.
 
 //------------------------------------------------------------------//
 
-GfxErr_t MandelbrotDraw                         (AppCtx_t* app);
+GfxErr_t MandelbrotDrawUnoptimized              (AppCtx_t* app);
 GfxErr_t MandelbrotDrawUnrolled                 (AppCtx_t* app);
 GfxErr_t MandelbrotDrawUnrolledWithFunctions    (AppCtx_t* app);
 GfxErr_t MandelbrotDrawIntrinsics               (AppCtx_t* app);

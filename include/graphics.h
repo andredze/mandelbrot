@@ -11,6 +11,7 @@
 #include <assert.h>
 #include "my_printfs.h"
 #include <avxintrin.h>
+#include "mandelbrot_test.h"
 
 //------------------------------------------------------------------//
 
@@ -24,8 +25,8 @@ const int SCALE_SCREEN_HEIGHT = 1;
 
 //------------------------------------------------------------------//
 
-const int SCREEN_WIDTH  = 1280 * 4;
-const int SCREEN_HEIGHT = 800 * 4;
+const int SCREEN_WIDTH  = 1280;
+const int SCREEN_HEIGHT = 800;
 
 //------------------------------------------------------------------//
 
@@ -72,6 +73,8 @@ typedef struct AppCtx
     float           y_zoom_span;
 
     TTF_Font*       font;
+
+    uint64_t        tests_cycles[TESTS_COUNT];
 }
 AppCtx_t;
 
