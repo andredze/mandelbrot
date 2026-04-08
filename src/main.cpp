@@ -7,6 +7,9 @@
 
 //------------------------------------------------------------------//
 
+// TODO: avx 512 instructions?
+// TODO: choose version from argv instead of ifdef
+
 int main(int argc, char* argv[])
 {
 	AppCtx_t app = {};

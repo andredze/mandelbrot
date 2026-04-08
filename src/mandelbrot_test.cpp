@@ -46,6 +46,8 @@ MakeTestIteration(AppCtx_t* app)
 #endif /* _TEST_AVX */
 
 #if defined(_SHOW_FPS)
+// TODO: fps on screen with text?
+
 	uint64_t end_ticks_in = GetTscEnd();
 
 	float fps = 1 / ((float) (end_ticks_in - start_ticks_in) / PROCESSOR_TSC_FREQUENCY);

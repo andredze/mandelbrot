@@ -15,6 +15,8 @@
 
 //------------------------------------------------------------------//
 
+// TODO: remove not used constants
+
 alignas (32) const float MM_COORD_X_KEY_STEP = 0.1f;
 alignas (32) const float MM_COORD_Y_KEY_STEP = 0.1f;
 

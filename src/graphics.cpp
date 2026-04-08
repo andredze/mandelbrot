@@ -120,6 +120,7 @@ GfxErr_t GfxUpdate(AppCtx_t* app)
         }
     }
 
+    // using key states instead of key presses for smooth changes when holding button
     const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
 
     if (current_key_states[SDL_SCANCODE_SPACE])

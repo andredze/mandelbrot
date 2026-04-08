@@ -7,6 +7,8 @@
 
 //------------------------------------------------------------------//
 
+// TODO: remove not used constants
+
 const int   MM_SIZE              = 8;
 
 const int   MANDELBROT_MAX_ITERS = 100;
@@ -56,9 +58,9 @@ alignas(32) const float MM_COORD_X_START[MM_SIZE] =
 
 //------------------------------------------------------------------//
 
-GfxErr_t MandelbrotDrawUnoptimized              (AppCtx_t* app);
-GfxErr_t MandelbrotDrawUnrolledWithFunctions    (AppCtx_t* app);
-GfxErr_t MandelbrotDrawIntrinsics               (AppCtx_t* app);
+void MandelbrotDrawUnoptimized           (AppCtx_t* app);
+void MandelbrotDrawUnrolledWithFunctions (AppCtx_t* app);
+void MandelbrotDrawIntrinsics            (AppCtx_t* app);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

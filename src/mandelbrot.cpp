@@ -26,7 +26,9 @@ static inline Uint32 MandelbrotGetColor(SDL_PixelFormat* format, int iters)
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-GfxErr_t MandelbrotDrawIntrinsics(AppCtx_t* app)
+// TODO: AVX 512
+
+void MandelbrotDrawIntrinsics(AppCtx_t* app)
 {
     assert(app);
 
@@ -47,10 +49,6 @@ GfxErr_t MandelbrotDrawIntrinsics(AppCtx_t* app)
 
         __m256 mm_x_start = _mm256_add_ps(mm_delta_x_01234567, _mm256_set1_ps(x_start_first));
         __m256 mm_y_start = _mm256_set1_ps(app->center_point_y + app->y_zoom_scale * ((float) pixel_y * 1 / SCREEN_HEIGHT - 0.5f));
-
-        // __m256 mm_x_start = _mm256_load_ps(MM_COORD_X_START); 
-        // __m256 mm_y_start = _mm256_set1_ps(((float) pixel_y / SCREEN_HEIGHT - 0.5f) * STARTING_ZOOM_SCALE_Y 
-        //                                     + STARTING_CENTER_POINT_Y);
 
         for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x += MM_SIZE)
         {
@@ -107,16 +105,15 @@ GfxErr_t MandelbrotDrawIntrinsics(AppCtx_t* app)
             mm_x_start = _mm256_add_ps(mm_x_start, mm_x_increment);
         }
     }
-
-    return GFX_SUCCESS;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-GfxErr_t MandelbrotDrawUnoptimized(AppCtx_t* app)
+void MandelbrotDrawUnoptimized(AppCtx_t* app)
 {
     assert(app);
 
+// TODO: убрать тк мы должны тестировать прогу в ее исходной версии
 #ifdef GRAPHICS
     float coord_x_inc = app->x_zoom_scale * 1 / SCREEN_WIDTH;
 #else
@@ -162,8 +159,6 @@ GfxErr_t MandelbrotDrawUnoptimized(AppCtx_t* app)
             DPRINTF("%d %d %d\n", pixel_x, pixel_y, iters);
         }
     }
-
-    return GFX_SUCCESS;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -281,10 +276,11 @@ MM_SubInt(      int32_t mm_dest[MM_SIZE],
 
 //------------------------------------------------------------------//
 
-GfxErr_t MandelbrotDrawUnrolledWithFunctions(AppCtx_t* app)
+void MandelbrotDrawUnrolledWithFunctions(AppCtx_t* app)
 {
     assert(app);
 
+// TODO: переделать на систему координат с center + zoom
     float coord_x_increment[MM_SIZE] = {};
     MM_SetValue(coord_x_increment, COORD_X_DIFF * MM_SIZE);
 
@@ -359,8 +355,6 @@ GfxErr_t MandelbrotDrawUnrolledWithFunctions(AppCtx_t* app)
             MM_Add(coord_x_start, coord_x_start, coord_x_increment);
         }
     }
-
-    return GFX_SUCCESS;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————

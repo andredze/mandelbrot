@@ -1,6 +1,8 @@
 # Ctrl + Alt + F3 to enter text console (tty)
 
-# disable graphics
+# FIXME: how to fix context switch ruining rdtsc
+
+# isolate system ???
 # sudo systemctl isolate multi-user.target
 
 # limit processor's frequency
