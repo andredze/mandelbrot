@@ -72,6 +72,9 @@ typedef struct AppCtx
     float           x_zoom_span;
     float           y_zoom_span;
 
+    float           center_point_x;
+    float           center_point_y;
+
     TTF_Font*       font;
 
     uint64_t        tests_cycles[TESTS_COUNT];

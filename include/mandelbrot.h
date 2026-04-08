@@ -9,9 +9,9 @@
 
 const int   MM_SIZE              = 8;
 
-const int   MANDELBROT_MAX_ITERS = 256;
+const int   MANDELBROT_MAX_ITERS = 100;
 
-const float STABLE_POINTS_CIRCLE_RADIUS         = 10;
+const float STABLE_POINTS_CIRCLE_RADIUS         = 2.0f;
 const float STABLE_POINTS_CIRCLE_RADIUS_SQUARED = STABLE_POINTS_CIRCLE_RADIUS * STABLE_POINTS_CIRCLE_RADIUS;
 
 const float COORD_Y_SHIFT      = -1.275f;
@@ -45,7 +45,6 @@ const float MM_NUMBER_2[MM_SIZE] = {2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.
 //------------------------------------------------------------------//
 
 GfxErr_t MandelbrotDrawUnoptimized              (AppCtx_t* app);
-GfxErr_t MandelbrotDrawUnrolled                 (AppCtx_t* app);
 GfxErr_t MandelbrotDrawUnrolledWithFunctions    (AppCtx_t* app);
 GfxErr_t MandelbrotDrawIntrinsics               (AppCtx_t* app);
 

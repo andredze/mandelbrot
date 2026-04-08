@@ -178,7 +178,7 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 
     SDL_LockSurface(app->screen_surface);
     
-    if ((error = MandelbrotDrawIntrinsics(app)))
+    if ((error = MandelbrotDrawUnrolledWithFunctions(app)))
     {
         return error;
     }
