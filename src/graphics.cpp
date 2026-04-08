@@ -3,6 +3,8 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+// google benchmark
+
 GfxErr_t GfxCtor(AppCtx_t* app)
 {
     assert(app);
@@ -46,20 +48,22 @@ GfxErr_t GfxCtor(AppCtx_t* app)
 
     //------------------------------------------------------------------//
 
-    if (TTF_Init() == -1)
-    {
-        PRINTERR("Failed to init fonts. TTF_Error: %s", TTF_GetError());
+    // if (TTF_Init() == -1)
+    // {
+    //     PRINTERR("Failed to init fonts. TTF_Error: %s", TTF_GetError());
 
-        return GFX_FONT_INIT_ERROR;
-    }
+    //     return GFX_FONT_INIT_ERROR;
+    // }
 
     //------------------------------------------------------------------//
 
-    app->mm_x_key_shift = _mm256_setzero_ps();
-    app->mm_y_key_shift = _mm256_setzero_ps();
+    app->center_point_x = STARTING_CENTER_POINT_X;
+    app->center_point_y = STARTING_CENTER_POINT_Y;
 
-    app->x_zoom_span = 1;
-    app->y_zoom_span = 1;
+    //------------------------------------------------------------------//
+
+    app->x_zoom_scale = STARTING_ZOOM_SCALE_X;
+    app->y_zoom_scale = STARTING_ZOOM_SCALE_Y;
 
     //------------------------------------------------------------------//
 
@@ -78,82 +82,55 @@ GfxErr_t GfxUpdate(AppCtx_t* app)
         {
             app->is_running = false;
         }
+        if (app->event.type != SDL_KEYDOWN)
+        {
+            continue;
+        }
+
+        switch (app->event.key.keysym.sym)
+        {
+            case SDLK_UP:
+                app->center_point_y -= COORD_Y_KEY_STEP * app->y_zoom_scale;
+                break;
+
+            case SDLK_DOWN:
+                app->center_point_y += COORD_Y_KEY_STEP * app->y_zoom_scale;
+                break;
+
+            case SDLK_LEFT:
+                app->center_point_x -= COORD_X_KEY_STEP * app->x_zoom_scale;
+                break;
+
+            case SDLK_RIGHT:
+                app->center_point_x += COORD_X_KEY_STEP * app->x_zoom_scale;
+                break;
+            
+            // case SDLK_SPACE:
+            //     app->x_zoom_scale *= 1.0f / ZOOM_SCALE_COEFF;
+            //     app->y_zoom_scale *= 1.0f / ZOOM_SCALE_COEFF;
+            //     break;
+
+            // case SDLK_RSHIFT:
+            //     app->x_zoom_scale *= ZOOM_SCALE_COEFF;
+            //     app->y_zoom_scale *= ZOOM_SCALE_COEFF;
+            //     break;
+
+            default:
+                break;
+        }
     }
 
     const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
 
-    if (current_key_states[SDL_SCANCODE_UP])
-    {
-        app->mm_y_key_shift = _mm256_sub_ps(app->mm_y_key_shift, _mm256_set1_ps(MM_COORD_Y_KEY_STEP));
-    }
-    if (current_key_states[SDL_SCANCODE_DOWN])
-    {
-        app->mm_y_key_shift = _mm256_add_ps(app->mm_y_key_shift, _mm256_set1_ps(MM_COORD_Y_KEY_STEP));
-    }
-    if (current_key_states[SDL_SCANCODE_LEFT])
-    {
-        app->mm_x_key_shift = _mm256_sub_ps(app->mm_x_key_shift, _mm256_set1_ps(MM_COORD_X_KEY_STEP));
-    }
-    if (current_key_states[SDL_SCANCODE_RIGHT])
-    {
-        app->mm_x_key_shift = _mm256_add_ps(app->mm_x_key_shift, _mm256_set1_ps(MM_COORD_X_KEY_STEP));
-    }
     if (current_key_states[SDL_SCANCODE_SPACE])
     {
-        app->x_zoom_span -= 0.1f;
-        app->y_zoom_span -= 0.1f;
+        app->x_zoom_scale *= 1.0f / ZOOM_SCALE_COEFF;
+        app->y_zoom_scale *= 1.0f / ZOOM_SCALE_COEFF;
     }
-    if (current_key_states[SDL_SCANCODE_RSHIFT])
+    else if (current_key_states[SDL_SCANCODE_RSHIFT])
     {
-        app->x_zoom_span += 0.1f;
-        app->y_zoom_span += 0.1f;
-    }
-
-    return GFX_SUCCESS;
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————
-
-GfxErr_t GfxPutPixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
-{
-    assert(surface);
-
-    int bpp = surface->format->BytesPerPixel;
-
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-    
-    switch (bpp) 
-    {
-        case 1:
-            *p = pixel;
-            break;
-
-        case 2:
-            *(Uint16 *)p = pixel;
-            break;
-
-        case 3:
-            if (SDL_BYTEORDER == SDL_BIG_ENDIAN) 
-            {
-                p[0] = (pixel >> 16) & 0xff;
-                p[1] = (pixel >> 8) & 0xff;
-                p[2] = pixel & 0xff;
-            } 
-            else 
-            {
-                p[0] = pixel & 0xff;
-                p[1] = (pixel >> 8) & 0xff;
-                p[2] = (pixel >> 16) & 0xff;
-            }
-
-            break;
-
-        case 4:
-            *(Uint32 *)p = pixel;
-            break;
-        
-        default:
-            break;
+        app->x_zoom_scale *= ZOOM_SCALE_COEFF;
+        app->y_zoom_scale *= ZOOM_SCALE_COEFF;
     }
 
     return GFX_SUCCESS;
@@ -178,10 +155,7 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 
     SDL_LockSurface(app->screen_surface);
     
-    if ((error = MandelbrotDrawUnrolledWithFunctions(app)))
-    {
-        return error;
-    }
+    MandelbrotDrawIntrinsics(app);
 
     SDL_UnlockSurface(app->screen_surface);
     
@@ -202,7 +176,7 @@ void GfxDtor(AppCtx_t* app)
     SDL_DestroyWindow(app->window);
     app->window = NULL;
 
-    TTF_Quit();
+    // TTF_Quit();
     SDL_Quit();
 }
 

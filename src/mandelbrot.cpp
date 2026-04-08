@@ -16,9 +16,9 @@ static inline Uint32 MandelbrotGetColor(SDL_PixelFormat* format, int iters)
     {
         float clr = 255 * sqrt(sqrt( (float) iters / MANDELBROT_MAX_ITERS ));
         
-        color_r = (Uint8) clr;
-        color_g = (Uint8) (255 - 50 * (iters % 40));
-        color_b = 205;
+        color_r = (Uint8) (255 - 50 * (iters % 40));
+        color_b = (Uint8) clr;
+        color_g = 205;
     }
 
     return SDL_MapRGB(format, color_r, color_g, color_b);
@@ -31,14 +31,27 @@ GfxErr_t MandelbrotDrawIntrinsics(AppCtx_t* app)
     assert(app);
 
     __m256 mm_number_2f     = _mm256_set1_ps(2.0f);
-    __m256 mm_x_increment   = _mm256_set1_ps(COORD_X_DIFF * MM_SIZE * app->x_zoom_span);
     __m256 mm_r_squared_max = _mm256_set1_ps(STABLE_POINTS_CIRCLE_RADIUS_SQUARED);
+    
+    float delta_x = app->x_zoom_scale * 1 / SCREEN_WIDTH;
+
+    __m256 mm_delta_x     = _mm256_set1_ps(delta_x);
+    __m256 mm_x_increment = _mm256_set1_ps(MM_SIZE * delta_x);
+
+    __m256 arr01234567         = _mm256_setr_ps(0, 1, 2, 3, 4, 5, 6, 7);
+    __m256 mm_delta_x_01234567 = _mm256_mul_ps(arr01234567, mm_delta_x);
 
     for (int pixel_y = 0; pixel_y < SCREEN_HEIGHT; pixel_y++)
     {
-        __m256 mm_x_start = _mm256_add_ps(_mm256_load_ps(MM_COORD_X_START), app->mm_x_key_shift); 
-        __m256 mm_y_start = _mm256_add_ps(_mm256_set1_ps(COORD_Y_SHIFT + (float) pixel_y * COORD_Y_DIFF * app->x_zoom_span), app->mm_y_key_shift);
-        
+        float x_start_first = app->center_point_x + app->x_zoom_scale * (-0.5f);
+
+        __m256 mm_x_start = _mm256_add_ps(mm_delta_x_01234567, _mm256_set1_ps(x_start_first));
+        __m256 mm_y_start = _mm256_set1_ps(app->center_point_y + app->y_zoom_scale * ((float) pixel_y * 1 / SCREEN_HEIGHT - 0.5f));
+
+        // __m256 mm_x_start = _mm256_load_ps(MM_COORD_X_START); 
+        // __m256 mm_y_start = _mm256_set1_ps(((float) pixel_y / SCREEN_HEIGHT - 0.5f) * STARTING_ZOOM_SCALE_Y 
+        //                                     + STARTING_CENTER_POINT_Y);
+
         for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x += MM_SIZE)
         {
             __m256 mm_x = mm_x_start;
@@ -104,12 +117,22 @@ GfxErr_t MandelbrotDrawUnoptimized(AppCtx_t* app)
 {
     assert(app);
 
+#ifdef GRAPHICS
+    float coord_x_inc = app->x_zoom_scale * 1 / SCREEN_WIDTH;
+#else
+    float coord_x_inc = STARTING_ZOOM_SCALE_X * 1 / SCREEN_WIDTH;
+#endif /* GRAPHICS */
+
     for (int pixel_y = 0; pixel_y < SCREEN_HEIGHT; pixel_y++)
     {
-        float coord_y_start = COORD_Y_SHIFT + COORD_Y_STEP_COEFF * ((float) pixel_y / SCREEN_HEIGHT),
-              coord_x_start = COORD_X_SHIFT,
-              coord_x_inc   = (float) COORD_X_STEP_COEFF / SCREEN_WIDTH;
-        
+#ifdef GRAPHICS
+        float coord_y_start = app->center_point_y + app->y_zoom_scale * ((float) pixel_y * 1 / SCREEN_HEIGHT - 0.5f);
+        float coord_x_start = app->center_point_x + app->x_zoom_scale * (-0.5f);
+#else
+        float coord_y_start = STARTING_CENTER_POINT_Y + STARTING_ZOOM_SCALE_Y * ((float) pixel_y * 1 / SCREEN_HEIGHT - 0.5f);
+        float coord_x_start = STARTING_CENTER_POINT_X + STARTING_ZOOM_SCALE_X * (-0.5f);
+#endif /* GRAPHICS */
+
         for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x++, coord_x_start += coord_x_inc)
         {
             float coord_x = coord_x_start,

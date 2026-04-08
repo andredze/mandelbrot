@@ -20,13 +20,17 @@ alignas (32) const float MM_COORD_Y_KEY_STEP = 0.1f;
 
 //------------------------------------------------------------------//
 
+const int BYTES_PER_PIXEL = 4;
+
+//------------------------------------------------------------------//
+
 const int SCALE_SCREEN_WIDTH  = 1;
 const int SCALE_SCREEN_HEIGHT = 1;
 
 //------------------------------------------------------------------//
 
-const int SCREEN_WIDTH  = 1280;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_WIDTH  = 1280 * 2;
+const int SCREEN_HEIGHT = 800 * 2;
 
 //------------------------------------------------------------------//
 
@@ -69,8 +73,8 @@ typedef struct AppCtx
     __m256          mm_x_key_shift;
     __m256          mm_y_key_shift;
 
-    float           x_zoom_span;
-    float           y_zoom_span;
+    float           x_zoom_scale;
+    float           y_zoom_scale;
 
     float           center_point_x;
     float           center_point_y;
@@ -83,7 +87,13 @@ AppCtx_t;
 
 //------------------------------------------------------------------//
 
-GfxErr_t GfxPutPixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
+inline void __attribute__((always_inline)) 
+GfxPutPixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
+{
+    *(Uint32*)(((Uint8 *)surface->pixels) + y * surface->pitch + x * BYTES_PER_PIXEL) = pixel;
+}
+
+//------------------------------------------------------------------//
 
 GfxErr_t GfxCtor    (AppCtx_t* app);
 GfxErr_t GfxUpdate  (AppCtx_t* app);
