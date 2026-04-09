@@ -23,6 +23,15 @@ MakeTestIteration(AppCtx_t* app)
 
 void MakeTests(struct AppCtx* app)
 {
+	// warmup cache
+	for (int test_number = 0; test_number < WARMUP_TESTS_COUNT; test_number++)
+	{
+		for (int i = 0; i < TEST_ITERATIONS_COUNT; i++)
+		{
+			MakeTestIteration(app);
+		}
+	}
+
     for (int test_number = 0; test_number < TESTS_COUNT; test_number++)
 	{
 		uint64_t start_ticks = GetTscStart();

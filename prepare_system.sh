@@ -2,12 +2,18 @@
 
 # FIXME: how to fix context switch ruining rdtsc
 
-# isolate system ???
-# sudo systemctl isolate multi-user.target
+# switch system to text-only mode, reducing gui background processes and threads that can run on our core
+sudo systemctl isolate multi-user.target
+
+# isolate core 2 from regular tasks
+isolcpus=2
+
+# isolate core 2 from clock interrupts
+nohz_full=2
 
 # limit processor's frequency
-sudo cpupower frequency-set --max 2.20GHz
-sudo cpupower frequency-set --min 2.20GHz
+sudo cpupower frequency-set --max 2.60GHz
+sudo cpupower frequency-set --min 2.60GHz
 
 # turn on performance for all CPU
 for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
@@ -18,4 +24,4 @@ done
 echo 1 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
 
 # check throttling counter
-# grep . /sys/devices/system/cpu/cpu*/thermal_throttle/*_throttle_count
+grep . /sys/devices/system/cpu/cpu*/thermal_throttle/*_throttle_count

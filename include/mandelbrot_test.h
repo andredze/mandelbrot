@@ -13,8 +13,9 @@ struct AppCtx;
 
 //------------------------------------------------------------------//
 
-const int 	 TESTS_COUNT   			 = 20;
-const int 	 TEST_ITERATIONS_COUNT   = 500;
+const int 	 WARMUP_TESTS_COUNT      = 2;
+const int 	 TESTS_COUNT   			 = 7;
+const int 	 TEST_ITERATIONS_COUNT   = 250;
 const size_t MHZ				     = 1000000;
 const size_t PROCESSOR_TSC_FREQUENCY = 3187 * MHZ; // Hz
 
