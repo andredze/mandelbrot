@@ -10,6 +10,7 @@
 // TODO: remove not used constants
 
 const int   MM_SIZE              = 8;
+const int   ZMM_SIZE             = 16;
 
 const int   MANDELBROT_MAX_ITERS = 100;
 
@@ -42,25 +43,14 @@ const float STARTING_ZOOM_SCALE_Y = STARTING_ZOOM_SCALE_X * ((float) SCREEN_HEIG
 const float STARTING_CENTER_POINT_X = -0.75f;
 const float STARTING_CENTER_POINT_Y = 0.0f;
 
-//------------------------------------------------------------------//
-
-alignas(32) const float MM_COORD_X_START[MM_SIZE] = 
-{   
-    COORD_X_SHIFT + 0 * COORD_X_DIFF,
-    COORD_X_SHIFT + 1 * COORD_X_DIFF,
-    COORD_X_SHIFT + 2 * COORD_X_DIFF,
-    COORD_X_SHIFT + 3 * COORD_X_DIFF,
-    COORD_X_SHIFT + 4 * COORD_X_DIFF,
-    COORD_X_SHIFT + 5 * COORD_X_DIFF,
-    COORD_X_SHIFT + 6 * COORD_X_DIFF,
-    COORD_X_SHIFT + 7 * COORD_X_DIFF
-};
+const float ARR_0TO15[ZMM_SIZE] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
 //------------------------------------------------------------------//
 
 void MandelbrotDrawUnoptimized           (AppCtx_t* app);
 void MandelbrotDrawUnrolledWithFunctions (AppCtx_t* app);
-void MandelbrotDrawIntrinsics            (AppCtx_t* app);
+void MandelbrotDrawIntrinsics256         (AppCtx_t* app);
+void MandelbrotDrawIntrinsics512         (AppCtx_t* app);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

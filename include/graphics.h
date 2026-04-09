@@ -31,8 +31,8 @@ const int SCALE_SCREEN_HEIGHT = 1;
 
 //------------------------------------------------------------------//
 
-const int SCREEN_WIDTH  = 1280 * 2;
-const int SCREEN_HEIGHT = 800 * 2;
+const int SCREEN_WIDTH  = 1280;
+const int SCREEN_HEIGHT = 800;
 
 //------------------------------------------------------------------//
 
@@ -42,11 +42,18 @@ const int WINDOW_SCREEN_HEIGHT = SCREEN_HEIGHT * SCALE_SCREEN_HEIGHT;
 //------------------------------------------------------------------//
 
 const char * const APP_WINDOW_NAME = "mandelbrot";
+const char * const FONT_FILE_PATH  = "assets/font.ttf";
+const int          FONT_SIZE       = 28;
 
 //------------------------------------------------------------------//
 
 const SDL_Color SDL_COLOR_RESET = {  0,   0,   0, 255};
 const SDL_Color SDL_COLOR_WHITE = {255, 255, 255, 255};
+
+//------------------------------------------------------------------//
+
+const int       FPS_TEXT_SIZE = 32;
+const SDL_Color FPS_FG_COLOR  = {255, 255, 255, 255};
 
 //------------------------------------------------------------------//
 
@@ -57,7 +64,9 @@ typedef enum GfxErr
     GFX_WINDOW_ERROR,
     GFX_SDL_RENDERER_ERROR,
     GFX_FONT_INIT_ERROR,
-    GFX_SURFACE_ERROR
+    GFX_LOAD_FONT_ERROR,
+    GFX_SURFACE_ERROR,
+    GFX_BLIT_ERROR
 }
 GfxErr_t;
 
@@ -83,6 +92,8 @@ typedef struct AppCtx
 
     TTF_Font*       font;
 
+    int             fps_counter;
+
     uint64_t        tests_cycles[TESTS_COUNT];
 }
 AppCtx_t;
@@ -101,6 +112,12 @@ GfxErr_t GfxCtor    (AppCtx_t* app);
 GfxErr_t GfxUpdate  (AppCtx_t* app);
 GfxErr_t GfxDraw    (AppCtx_t* app);
 void     GfxDtor    (AppCtx_t* app);
+
+GfxErr_t GfxDrawText(AppCtx_t*        app,
+                     const char*      string,
+                     int              x, 
+                     int              y,
+                     const SDL_Color* fg_color);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

@@ -41,12 +41,12 @@ endif
 
 # ------------------------------------------------------------------ #
 
-ifdef TEST_AVX
-	CXXFLAGS += -D _TEST_AVX
-else ifdef TEST_UNOPTIMIZED
-	CXXFLAGS += -D _TEST_UNOPTIMIZED
-else ifdef TEST_ARRAYS
-	CXXFLAGS += -D _TEST_ARRAYS
+ifdef AVX
+	CXXFLAGS += -D _AVX
+else ifdef ARRAYS
+	CXXFLAGS += -D _ARRAYS
+else ifdef NAIVE
+	CXXFLAGS += -D _NAIVE
 endif
 
 # ------------------------------------------------------------------ #

@@ -39,6 +39,13 @@ int main(int argc, char* argv[])
 	
 	fprintf(stderr, "Test mode\n");
 
+	const char* test_filename = DEFAULT_TEST_FILENAME;
+
+	if (argc == 2)
+	{
+		test_filename = argv[1];
+	}
+
 	app.screen_surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0, 0, 0, 0);
 	
 	MakeTests(&app);
@@ -46,28 +53,10 @@ int main(int argc, char* argv[])
 	SDL_FreeSurface(app.screen_surface);
 	app.screen_surface = NULL;
 
-	const char* test_filename = "data/test.csv";
-
-	if (argc == 2)
+	if (WriteTestData(&app, test_filename) == 1)
 	{
-		test_filename = argv[1];
-	}
-
-	FILE* test_data_file = fopen(test_filename, "w");
-
-	if (test_data_file == NULL)
-	{
-		PRINTERR("Failed to open file %s", test_filename);
-
 		return EXIT_FAILURE;
 	}
-
-	for (int i = 0; i < TESTS_COUNT; i++)
-	{
-		fprintf(test_data_file, "%zu\n", app.tests_cycles[i]);
-	}
-
-	fclose(test_data_file);
 
 	return EXIT_SUCCESS;
 #endif

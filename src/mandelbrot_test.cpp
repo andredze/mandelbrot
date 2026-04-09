@@ -1,59 +1,22 @@
 #include "mandelbrot_test.h"
 #include "graphics.h"
 #include "mandelbrot.h"
-
-//------------------------------------------------------------------//
-
-static inline __attribute__((always_inline)) uint64_t
-GetTscStart(void)
-{
-	_mm_lfence();
-
-	return __rdtsc();
-}
-
-//------------------------------------------------------------------//
-
-static inline __attribute__((always_inline)) uint64_t 
-GetTscEnd(void)
-{
-	uint32_t cpuid = 0;
-	uint64_t cycles = __rdtscp(&cpuid);
-	
-	_mm_lfence();
-
-	return cycles;
-}
+#include "time_stamp.h"
 
 //------------------------------------------------------------------//
 
 static inline __attribute__((always_inline)) void
 MakeTestIteration(AppCtx_t* app)
 {
-#if defined(_SHOW_FPS)
-	uint64_t start_ticks_in = GetTscStart();
-#endif /* _SHOW_FPS */
+#if defined(_AVX)
+	MandelbrotDrawIntrinsics512(app);
 
-#if defined(_TEST_AVX)
-	MandelbrotDrawIntrinsics(app);
-
-#elif defined(_TEST_ARRAYS)
+#elif defined(_ARRAYS)
 	MandelbrotDrawUnrolledWithFunctions(app);
 
-#elif defined(_TEST_UNOPTIMIZED)
+#elif defined(_NAIVE)
 	MandelbrotDrawUnoptimized(app);
-
-#endif /* _TEST_AVX */
-
-#if defined(_SHOW_FPS)
-// TODO: fps on screen with text?
-
-	uint64_t end_ticks_in = GetTscEnd();
-
-	float fps = 1 / ((float) (end_ticks_in - start_ticks_in) / PROCESSOR_TSC_FREQUENCY);
-
-	fprintf(stderr, "FPS = %.2f\n", fps);
-#endif /* _SHOW_FPS */
+#endif /* _AVX */
 }
 
 //------------------------------------------------------------------//
@@ -77,6 +40,29 @@ void MakeTests(struct AppCtx* app)
 
 		fprintf(stderr, "total ticks = %zu\n", cycles);
 	}
+}
+
+//------------------------------------------------------------------//
+
+int WriteTestData(AppCtx_t* app, const char* test_filename)
+{
+	FILE* test_data_file = fopen(test_filename, "w");
+
+	if (test_data_file == NULL)
+	{
+		PRINTERR("Failed to open file %s", test_filename);
+
+		return 1;
+	}
+
+	for (int i = 0; i < TESTS_COUNT; i++)
+	{
+		fprintf(test_data_file, "%zu\n", app->tests_cycles[i]);
+	}
+
+	fclose(test_data_file);
+
+	return 0;
 }
 
 //------------------------------------------------------------------//

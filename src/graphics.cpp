@@ -1,9 +1,8 @@
 #include "graphics.h"
 #include "mandelbrot.h"
+#include "time_stamp.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
-
-// google benchmark
 
 GfxErr_t GfxCtor(AppCtx_t* app)
 {
@@ -48,12 +47,23 @@ GfxErr_t GfxCtor(AppCtx_t* app)
 
     //------------------------------------------------------------------//
 
-    // if (TTF_Init() == -1)
-    // {
-    //     PRINTERR("Failed to init fonts. TTF_Error: %s", TTF_GetError());
+    if (TTF_Init() == -1)
+    {
+        PRINTERR("Failed to init fonts. TTF_Error: %s", TTF_GetError());
 
-    //     return GFX_FONT_INIT_ERROR;
-    // }
+        return GFX_FONT_INIT_ERROR;
+    }
+
+    //------------------------------------------------------------------//
+
+    app->font = TTF_OpenFont(FONT_FILE_PATH, FONT_SIZE);
+
+    if (app->font == NULL)
+    {
+        PRINTERR("Failed to open font %s. Error: %s", FONT_FILE_PATH, TTF_GetError());
+        
+        return GFX_LOAD_FONT_ERROR;
+    }
 
     //------------------------------------------------------------------//
 
@@ -104,16 +114,6 @@ GfxErr_t GfxUpdate(AppCtx_t* app)
             case SDLK_RIGHT:
                 app->center_point_x += COORD_X_KEY_STEP * app->x_zoom_scale;
                 break;
-            
-            // case SDLK_SPACE:
-            //     app->x_zoom_scale *= 1.0f / ZOOM_SCALE_COEFF;
-            //     app->y_zoom_scale *= 1.0f / ZOOM_SCALE_COEFF;
-            //     break;
-
-            // case SDLK_RSHIFT:
-            //     app->x_zoom_scale *= ZOOM_SCALE_COEFF;
-            //     app->y_zoom_scale *= ZOOM_SCALE_COEFF;
-            //     break;
 
             default:
                 break;
@@ -143,6 +143,8 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 {
     assert(app);
 
+    uint64_t start_ticks_in = GetTscStart();
+
     Uint32 black_color = SDL_MapRGB(app->screen_surface->format, 0, 0, 0);
 
     SDL_Rect screen_rect = {.x = 0,
@@ -155,12 +157,54 @@ GfxErr_t GfxDraw(AppCtx_t* app)
     GfxErr_t error = GFX_SUCCESS;
 
     SDL_LockSurface(app->screen_surface);
-    
-    MandelbrotDrawIntrinsics(app);
+
+#if defined(_AVX)
+	MandelbrotDrawIntrinsics512(app);
+
+#elif defined(_ARRAYS)
+	MandelbrotDrawUnrolledWithFunctions(app);
+
+#elif defined(_NAIVE)
+	MandelbrotDrawUnoptimized(app);
+#endif /* _AVX */
+
+	uint64_t end_ticks_in = GetTscEnd();
+
+	app->fps_counter = (int) ((float) 1 / ((float) (end_ticks_in - start_ticks_in) * 1 / PROCESSOR_TSC_FREQUENCY));
+
+    char fps_text[FPS_TEXT_SIZE] = {};
+
+    snprintf(fps_text, sizeof(fps_text), "FPS = %d", app->fps_counter);
 
     SDL_UnlockSurface(app->screen_surface);
-    
+
+    GfxDrawText(app, fps_text, 20, 20, &FPS_FG_COLOR);
+
     SDL_UpdateWindowSurface(app->window);
+
+    return GFX_SUCCESS;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+GfxErr_t GfxDrawText(AppCtx_t*        app,
+                     const char*      string,
+                     int              x, 
+                     int              y,
+                     const SDL_Color* fg_color)
+{
+    SDL_Surface* text_surface = TTF_RenderText_Blended(app->font, string, *fg_color);
+
+    SDL_Rect text_location_rect = {x, y, 0, 0};
+
+    if (SDL_BlitSurface(text_surface, NULL, app->screen_surface, &text_location_rect) < 0)
+    {
+        PRINTERR("Failed blit surface. Error %s", SDL_GetError());
+
+        return GFX_BLIT_ERROR;
+    }
+
+    SDL_FreeSurface(text_surface);
 
     return GFX_SUCCESS;
 }
@@ -177,7 +221,10 @@ void GfxDtor(AppCtx_t* app)
     SDL_DestroyWindow(app->window);
     app->window = NULL;
 
-    // TTF_Quit();
+    TTF_CloseFont(app->font);
+    app->font = NULL;
+
+    TTF_Quit();
     SDL_Quit();
 }
 
