@@ -51,11 +51,6 @@ theoretical maximum = x16 speed<br> -->
     <tr><td>avx</td><td>3.14</td><td>3.14</td><td>3.15</td><td>3.40</td><td>3.44</td><td>2.75</td></tr>
   </tbody>
 </table>
-<style>
-  th {
-    text-align: center;
-  }
-</style>
 
 <table>
   <thead>
@@ -68,11 +63,6 @@ theoretical maximum = x16 speed<br> -->
     <tr><td>avx</td><td>13.29</td><td>13.29</td><td>13.25</td><td>11.97</td><td>11.81</td><td>14.76</td></tr>
   </tbody>
 </table>
-<style>
-  th {
-    text-align: center;
-  }
-</style>
 
 <p align="center">
     <img src="data/histogram.png" width="75%">
