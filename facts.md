@@ -75,7 +75,7 @@ theoretical maximum = x16 speed<br> -->
 </style>
 
 <p align="center">
-    <img src="plot/histogram.png" width="75%">
+    <img src="data/histogram.png" width="75%">
 </p>
 
 <!-- Для измерения состояния процессора была использована утилита **s-tui**. 
@@ -98,6 +98,6 @@ theoretical maximum = x16 speed<br> -->
 <!-- Температура при тестах не поднималась выше 60 градусов, что говорит об отсутствии троттлинга на производительность процессора. -->
 
 <p align="center">
-    <img src="plot/temp.png" width="75%">
+    <img src="data/temp.png" width="75%">
 </p>
 
