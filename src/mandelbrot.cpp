@@ -19,7 +19,7 @@ static inline Uint32 MandelbrotGetColor(SDL_PixelFormat* format, int iters)
 
     if (iters < MANDELBROT_MAX_ITERS)
     {
-        float clr = 255 * sqrt(sqrt( (float) iters * (1 / MANDELBROT_MAX_ITERS) ));
+        float clr = 255 * sqrt(sqrt( (float) iters * (1.0f / MANDELBROT_MAX_ITERS) ));
         
         color_r = (Uint8) (255 - 50 * (iters % 40));
         color_b = (Uint8) clr;

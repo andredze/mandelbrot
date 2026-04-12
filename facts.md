@@ -64,6 +64,42 @@ theoretical maximum = x16 speed<br> -->
   </tbody>
 </table>
 
+<!-- В случае с версии с массивами оптимизация -O2 оказалась в 6 раз быстрее оптимизации -O3 для компилятора g++.
+Компилятор при опции -O2 использовал SIMD-инструкции. Однако в случае
+с -O3 компилятор использует множество скалярных операций и обращений к стеку вместо векторных инструкций.
+Это может быть связано с тем, что компилятор позволяет себе более агрессивные оптимизации, конфликтующие с
+SIMD-инструкциями. -->
+
+## g++ O2 vs O3 (arrays version)
+<table>
+<tr>
+<td><img src="assets/g++_arrays_O2.png"></td>
+<td><img src="assets/g++_arrays_O3.png"></td>
+</tr>
+</table>
+
+<!-- Здесь разница заключается в основном в том, что в версии -O3 напрямую делается call sqrtf,
+а в версии -Ofast используется инструкция vsqrtss -->
+
+## clang++ O3 vs Ofast (avx version)
+<table>
+<tr>
+<td><img src="assets/clang_avx_O3.png"></td>
+<td><img src="assets/clang_avx_Ofast.png"></td>
+</tr>
+</table>
+
+<!-- Компилятор clang в версии с массивами не смог полностью векторизовать код, используя частично xmm и частично ymm регистры,
+из-за чего версия, скомпилированная компилятором clang оказалась примерно в 2 раза медленнее. -->
+
+## clang++ O2 vs g++ O2 (arrays version)
+<table>
+<tr>
+<td><img src="assets/g++_arrays_O2_clangdiff.png"></td>
+<td><img src="assets/clang++_arrays_O2.png"></td>
+</tr>
+</table>
+
 <p align="center">
     <img src="data/histogram.png" width="75%">
 </p>

@@ -143,7 +143,7 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 {
     assert(app);
 
-    uint64_t start_ticks_in = GetTscStart();
+    uint64_t start_cycles_in = GetTscStart();
 
     Uint32 black_color = SDL_MapRGB(app->screen_surface->format, 0, 0, 0);
 
@@ -168,9 +168,9 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 	MandelbrotDrawUnoptimized(app);
 #endif /* _AVX */
 
-	uint64_t end_ticks_in = GetTscEnd();
+	uint64_t end_cycles_in = GetTscEnd();
 
-	app->fps_counter = (int) ((float) PROCESSOR_TSC_FREQUENCY / ((float) (end_ticks_in - start_ticks_in)));
+	app->fps_counter = (int) ((float) PROCESSOR_TSC_FREQUENCY / ((float) (end_cycles_in - start_cycles_in)));
 
     char fps_text[FPS_TEXT_SIZE] = {};
 

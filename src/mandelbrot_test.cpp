@@ -34,20 +34,20 @@ void MakeTests(struct AppCtx* app)
 
     for (int test_number = 0; test_number < TESTS_COUNT; test_number++)
 	{
-		uint64_t start_ticks = GetTscStart();
+		uint64_t start_cycles = GetTscStart();
 	
 		for (int i = 0; i < TEST_ITERATIONS_COUNT; i++)
 		{
 			MakeTestIteration(app);
 		}
 		
-		uint64_t end_ticks = GetTscEnd();
+		uint64_t end_cycles = GetTscEnd();
 
-		uint64_t cycles = end_ticks - start_ticks;
+		uint64_t cycles = end_cycles - start_cycles;
 		
 		app->tests_cycles[test_number] = cycles;
 
-		fprintf(stderr, "total ticks = %zu\n", cycles);
+		fprintf(stderr, "total cycles = %zu\n", cycles);
 	}
 }
 
