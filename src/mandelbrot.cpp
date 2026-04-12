@@ -2,8 +2,12 @@
 #include "math.h"
 #include "graphics.h"
 #include <stdint.h>
-// #include "immintrin_dbg.h"
-#include <immintrin.h>
+
+#ifdef DEBUG
+    #include "immintrin_dbg.h"
+#else
+    #include <x86intrin.h>
+#endif /* DEBUG */
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -15,7 +19,7 @@ static inline Uint32 MandelbrotGetColor(SDL_PixelFormat* format, int iters)
 
     if (iters < MANDELBROT_MAX_ITERS)
     {
-        float clr = 255 * sqrt(sqrt( (float) iters / MANDELBROT_MAX_ITERS ));
+        float clr = 255 * sqrt(sqrt( (float) iters * (1 / MANDELBROT_MAX_ITERS) ));
         
         color_r = (Uint8) (255 - 50 * (iters % 40));
         color_b = (Uint8) clr;
@@ -26,7 +30,6 @@ static inline Uint32 MandelbrotGetColor(SDL_PixelFormat* format, int iters)
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————
-// TODO: AVX 512
 
 void MandelbrotDrawIntrinsics256(AppCtx_t* app)
 {
@@ -38,7 +41,7 @@ void MandelbrotDrawIntrinsics256(AppCtx_t* app)
     float delta_x = app->x_zoom_scale * (1.0f / SCREEN_WIDTH);
 
     __m256 mm_delta_x       = _mm256_set1_ps(delta_x);
-    __m256 mm_x_increment   = _mm256_set1_ps(MM_SIZE * delta_x);
+    __m256 mm_x_increment   = _mm256_set1_ps(YMM_SIZE * delta_x);
 
     __m256 arr_0to7         = _mm256_setr_ps(0, 1, 2, 3, 4, 5, 6, 7);
     __m256 mm_delta_x_0to7  = _mm256_mul_ps(arr_0to7, mm_delta_x);
@@ -50,7 +53,7 @@ void MandelbrotDrawIntrinsics256(AppCtx_t* app)
         __m256 mm_x_start = _mm256_add_ps(mm_delta_x_0to7, _mm256_set1_ps(x_start_first));
         __m256 mm_y_start = _mm256_set1_ps(app->center_point_y + app->y_zoom_scale * ((float) pixel_y * (1.0f / SCREEN_HEIGHT) - 0.5f));
 
-        for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x += MM_SIZE)
+        for (int pixel_x = 0; pixel_x < SCREEN_WIDTH; pixel_x += YMM_SIZE)
         {
             __m256 mm_x = mm_x_start;
             __m256 mm_y = mm_y_start;
@@ -87,20 +90,16 @@ void MandelbrotDrawIntrinsics256(AppCtx_t* app)
             
             // convert __m256i to integer array through memory
             // mem_addr must be aligned on a 32-byte boundary
-            alignas(32) int iters[MM_SIZE] = {};
+            alignas(32) int iters[YMM_SIZE] = {};
 
             _mm256_store_si256( (__m256i*) iters, mm_iters);
 
-            for (int i = 0; i < MM_SIZE; i++)
+            for (int i = 0; i < YMM_SIZE; i++)
             {
                 Uint32 pixel_color = MandelbrotGetColor(app->screen_surface->format, iters[i]);
                 
                 GfxPutPixel(app->screen_surface, pixel_x + i, pixel_y, pixel_color);
-
-                DPRINTF("%d %d %d\t", pixel_x + i, pixel_y, iters[i]);
             }
-
-            DPRINTF("\n");
 
             mm_x_start = _mm256_add_ps(mm_x_start, mm_x_increment);
         }
@@ -177,11 +176,7 @@ void MandelbrotDrawIntrinsics512(AppCtx_t* app)
                 Uint32 pixel_color = MandelbrotGetColor(app->screen_surface->format, iters[i]);
                 
                 GfxPutPixel(app->screen_surface, pixel_x + i, pixel_y, pixel_color);
-
-                DPRINTF("%d %d %d\t", pixel_x + i, pixel_y, iters[i]);
             }
-
-            DPRINTF("\n");
 
             mm_x_start = _mm512_add_ps(mm_x_start, mm_x_increment);
         }
@@ -373,18 +368,12 @@ void MandelbrotDrawUnrolledWithFunctions(AppCtx_t* app)
                 MM_AddInt(iters, iters, is_stable_mask_array);
             }
             
-            DPRINTF("Drawing points: ");
-            
             for (int i = 0; i < ZMM_SIZE; i++)
             {
                 Uint32 pixel_color = MandelbrotGetColor(app->screen_surface->format, iters[i]);
                 
                 GfxPutPixel(app->screen_surface, pixel_x + i, pixel_y, pixel_color);
-
-                DPRINTF("%d %d %d\t", pixel_x + i, pixel_y, iters[i]);
             }
-
-            DPRINTF("\n");
 
             MM_Add(coord_x_start, coord_x_start, coord_x_increment);
         }
@@ -397,7 +386,7 @@ void MandelbrotDrawUnoptimized(AppCtx_t* app)
 {
     assert(app);
 
-    float coord_x_inc = app->x_zoom_scale * 1 / SCREEN_WIDTH;
+    float coord_x_inc = app->x_zoom_scale * (1.0f / SCREEN_WIDTH);
 
     for (int pixel_y = 0; pixel_y < SCREEN_HEIGHT; pixel_y++)
     {
@@ -429,8 +418,6 @@ void MandelbrotDrawUnoptimized(AppCtx_t* app)
             Uint32 pixel_color = MandelbrotGetColor(app->screen_surface->format, iters);
             
             GfxPutPixel(app->screen_surface, pixel_x, pixel_y, pixel_color);
-
-            DPRINTF("%d %d %d\n", pixel_x, pixel_y, iters);
         }
     }
 }

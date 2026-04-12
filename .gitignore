@@ -2,4 +2,7 @@ run
 *.o
 *.csv
 todo
-!data/*.csv
+data/freq.png
+data/freq.plot
+data/cpu-freq.csv
+data/cpu-temp.csv

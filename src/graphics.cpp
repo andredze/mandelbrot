@@ -170,7 +170,7 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 
 	uint64_t end_ticks_in = GetTscEnd();
 
-	app->fps_counter = (int) ((float) 1 / ((float) (end_ticks_in - start_ticks_in) * 1 / PROCESSOR_TSC_FREQUENCY));
+	app->fps_counter = (int) ((float) PROCESSOR_TSC_FREQUENCY / ((float) (end_ticks_in - start_ticks_in)));
 
     char fps_text[FPS_TEXT_SIZE] = {};
 

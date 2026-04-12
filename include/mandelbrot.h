@@ -7,26 +7,13 @@
 
 //------------------------------------------------------------------//
 
-// TODO: remove not used constants
-
-const int   MM_SIZE              = 8;
+const int   YMM_SIZE             = 8;
 const int   ZMM_SIZE             = 16;
 
 const int   MANDELBROT_MAX_ITERS = 100;
 
 const float STABLE_POINTS_CIRCLE_RADIUS         = 2.0f;
 const float STABLE_POINTS_CIRCLE_RADIUS_SQUARED = STABLE_POINTS_CIRCLE_RADIUS * STABLE_POINTS_CIRCLE_RADIUS;
-
-const float COORD_Y_SHIFT      = -1.275f;
-const float COORD_Y_STEP_COEFF = 2.5f;
-
-const float COORD_X_SHIFT      = -2.4f;
-const float COORD_X_STEP_COEFF = 4.0f;
-
-//------------------------------------------------------------------//
-
-const float COORD_X_DIFF = COORD_X_STEP_COEFF / SCREEN_WIDTH;
-const float COORD_Y_DIFF = COORD_Y_STEP_COEFF / SCREEN_HEIGHT;
 
 //------------------------------------------------------------------//
 

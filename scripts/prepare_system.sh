@@ -1,7 +1,5 @@
 # Ctrl + Alt + F3 to enter text console (tty)
-
-# FIXME: how to fix context switch ruining rdtsc
-
+|
 # switch system to text-only mode, reducing gui background processes and threads that can run on our core
 sudo systemctl isolate multi-user.target
 
@@ -12,8 +10,8 @@ isolcpus=2
 nohz_full=2
 
 # limit processor's frequency
-sudo cpupower frequency-set --max 2.60GHz
-sudo cpupower frequency-set --min 2.60GHz
+sudo cpupower frequency-set --max 2.80GHz
+sudo cpupower frequency-set --min 2.80GHz
 
 # turn on performance for all CPU
 for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do

@@ -15,13 +15,6 @@
 
 //------------------------------------------------------------------//
 
-// TODO: remove not used constants
-
-alignas (32) const float MM_COORD_X_KEY_STEP = 0.1f;
-alignas (32) const float MM_COORD_Y_KEY_STEP = 0.1f;
-
-//------------------------------------------------------------------//
-
 const int BYTES_PER_PIXEL = 4;
 
 //------------------------------------------------------------------//
@@ -53,7 +46,7 @@ const SDL_Color SDL_COLOR_WHITE = {255, 255, 255, 255};
 //------------------------------------------------------------------//
 
 const int       FPS_TEXT_SIZE = 32;
-const SDL_Color FPS_FG_COLOR  = {255, 255, 255, 255};
+const SDL_Color FPS_FG_COLOR  = SDL_COLOR_WHITE;
 
 //------------------------------------------------------------------//
 

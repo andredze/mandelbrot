@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <immintrin.h>
+#include <x86intrin.h>
 
 //------------------------------------------------------------------//
 
@@ -13,9 +13,9 @@ struct AppCtx;
 
 //------------------------------------------------------------------//
 
-const int 	 WARMUP_TESTS_COUNT      = 2;
-const int 	 TESTS_COUNT   			 = 7;
-const int 	 TEST_ITERATIONS_COUNT   = 250;
+const int 	 WARMUP_TESTS_COUNT      = 4;
+const int 	 TESTS_COUNT   			 = 5;
+const int 	 TEST_ITERATIONS_COUNT   = 100;
 const size_t MHZ				     = 1000000;
 const size_t PROCESSOR_TSC_FREQUENCY = 3187 * MHZ; // Hz
 

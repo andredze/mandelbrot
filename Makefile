@@ -22,7 +22,7 @@ ASAN = -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,$\
 
 CXX = g++
 
-CXXFLAGS = -march=native -g -fno-omit-frame-pointer
+CXXFLAGS = -march=native
 
 INCLUDES += -I include
 
@@ -34,28 +34,22 @@ SOURCES = src/main.cpp	 		  \
 # ------------------------------------------------------------------ #
 
 ifdef DEBUG
-	CXXFLAGS += -D DEBUG $(DED_FLAGS) $(ASAN)
+	CXXFLAGS += -D DEBUG $(DED_FLAGS) $(ASAN) -g
 else
 	CXXFLAGS += -DNDEBUG
 endif
 
 # ------------------------------------------------------------------ #
 
-ifdef AVX
-	CXXFLAGS += -D _AVX
-else ifdef ARRAYS
-	CXXFLAGS += -D _ARRAYS
-else ifdef NAIVE
-	CXXFLAGS += -D _NAIVE
-endif
+VERSION=AVX
+
+CXXFLAGS += -D _$(VERSION)
 
 # ------------------------------------------------------------------ #
 
-ifdef WITH_O3
-	CXXFLAGS += -O3
-else
-	CXXFLAGS += -O2
-endif
+OPT = -O2
+
+CXXFLAGS += $(OPT)
 
 # ------------------------------------------------------------------ #
 
