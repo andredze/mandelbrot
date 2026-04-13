@@ -23,8 +23,8 @@ int main()
 
     char full_path[256] = {};
     
-    const char* dir_gcc   = "data/g++/";
-    const char* dir_clang = "data/clang++/";
+    const char* dir_gcc   = "g++/";
+    const char* dir_clang = "clang++/";
 
     const char* dir_compilers[] = {dir_gcc, dir_clang};
 

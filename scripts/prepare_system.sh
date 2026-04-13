@@ -1,5 +1,5 @@
 # Ctrl + Alt + F3 to enter text console (tty)
-|
+
 # switch system to text-only mode, reducing gui background processes and threads that can run on our core
 sudo systemctl isolate multi-user.target
 

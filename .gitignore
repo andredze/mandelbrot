@@ -7,3 +7,4 @@ data/freq.plot
 data/cpu-freq.csv
 data/cpu-temp.csv
 godbolt.cpp
+data/analyze
