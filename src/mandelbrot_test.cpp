@@ -1,7 +1,6 @@
 #include "mandelbrot_test.h"
 #include "graphics.h"
 #include "mandelbrot.h"
-#include "time_stamp.h"
 
 //------------------------------------------------------------------//
 
@@ -34,14 +33,14 @@ void MakeTests(struct AppCtx* app)
 
     for (int test_number = 0; test_number < TESTS_COUNT; test_number++)
 	{
-		uint64_t start_cycles = GetTscStart();
+		uint64_t start_cycles = __rdtsc();
 	
 		for (int i = 0; i < TEST_ITERATIONS_COUNT; i++)
 		{
 			MakeTestIteration(app);
 		}
 		
-		uint64_t end_cycles = GetTscEnd();
+		uint64_t end_cycles = __rdtsc();
 
 		uint64_t cycles = end_cycles - start_cycles;
 		

@@ -1,6 +1,5 @@
 #include "graphics.h"
 #include "mandelbrot.h"
-#include "time_stamp.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -143,7 +142,7 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 {
     assert(app);
 
-    uint64_t start_cycles_in = GetTscStart();
+    uint64_t start_cycles_in = __rdtsc();
 
     Uint32 black_color = SDL_MapRGB(app->screen_surface->format, 0, 0, 0);
 
@@ -168,7 +167,7 @@ GfxErr_t GfxDraw(AppCtx_t* app)
 	MandelbrotDrawUnoptimized(app);
 #endif /* _AVX */
 
-	uint64_t end_cycles_in = GetTscEnd();
+	uint64_t end_cycles_in = __rdtsc();
 
 	app->fps_counter = (int) ((float) PROCESSOR_TSC_FREQUENCY / ((float) (end_cycles_in - start_cycles_in)));
 
