@@ -4,6 +4,7 @@
 #include <math.h>
 
 //------------------------------------------------------------------//
+// погрешность делить на корень из колва измерений
 
 int main()
 {
@@ -38,11 +39,12 @@ int main()
 
     double baseline = 0;
 
-    fprintf(file_dest, "%-32s %15s %15s %15s %12s\n",
-            "test", "mean", "std", "eps", "coeff");
+    fprintf(file_dest, "%-32s %15s %15s %15s %15s %12s\n",
+            "test", "mean", "std", "delta", "eps, %", "coeff");
 
-    fprintf(file_dest, "%-32s %15s %15s %15s %12s\n",
+    fprintf(file_dest, "%-32s %15s %15s %15s %15s %12s\n",
             "--------------------------------",
+            "---------------",
             "---------------",
             "---------------",
             "---------------",
@@ -94,8 +96,11 @@ int main()
 
             std = sqrt(std / count);
 
-            fprintf(file_dest, "%-32s %15.6e %15.6e %15.6f %12.6f\n",
-                    full_path, mean, std, std / mean, baseline / mean);
+            double delta = std / sqrt(count);
+            double eps   = 100 * delta / mean;
+
+            fprintf(file_dest, "%-32s %15.2e %15.2e %15.2e %15.3f %12.6f\n",
+                    full_path, mean, std, delta, eps, baseline / mean);
 
             fclose(data_file);
         }
