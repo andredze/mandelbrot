@@ -182,8 +182,8 @@ SIMD-инструкциями. -->
 <p align="center">
     <img src="assets/fmadd_memory.png" width="75%">
 </p>
-<!-- 
-Нажав в godbolt Scroll to source, увидим, что это скомпилированная следующая строка:
+
+<!-- Нажав в godbolt Scroll to source, увидим, что это скомпилированная следующая строка: -->
 ```c
   __m512 mm_y_start = _mm512_set1_ps(app->center_point_y + app->y_zoom_scale * ((float) pixel_y * (1.0f / SCREEN_HEIGHT) - 0.5f));
 ```
