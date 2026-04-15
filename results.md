@@ -178,17 +178,17 @@ SIMD-инструкциями. -->
 <!-- и начал использовать для них регистры. -->
 
 <!-- Однако осталось еще одно обращение в память в теле вложенного цикла. Оно происходит в инструкции `vfmadd132ss` (.LC4[rip]). -->
-
 ```c
-  __m512 mm_y_start = _mm512_set1_ps(y_adding + y_coeff * (float) pixel_y);
+  __m512 mm_y_start = _mm512_set1_ps(app->center_point_y + app->y_zoom_scale * ((float) pixel_y * (1.0f / SCREEN_HEIGHT) - 0.5f));
 ```
 <p align="center">
     <img src="assets/fmadd_memory.png" width="75%">
 </p>
 
 <!-- Нажав в godbolt Scroll to source, увидим, что это скомпилированная следующая строка: -->
+
 ```c
-  __m512 mm_y_start = _mm512_set1_ps(app->center_point_y + app->y_zoom_scale * ((float) pixel_y * (1.0f / SCREEN_HEIGHT) - 0.5f));
+  __m512 mm_y_start = _mm512_set1_ps(y_adding + y_coeff * (float) pixel_y);
 ```
 
 <!-- И да, пройдя по метке .LC4 убедимся, что это и есть константа (1.0f / SCREEN_HEIGHT). -->
