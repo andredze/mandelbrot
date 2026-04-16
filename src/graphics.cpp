@@ -76,6 +76,10 @@ GfxErr_t GfxCtor(AppCtx_t* app)
 
     //------------------------------------------------------------------//
 
+    GetColorTable(app);
+
+    //------------------------------------------------------------------//
+
     return GFX_SUCCESS;    
 }
 
@@ -213,9 +217,6 @@ GfxErr_t GfxDrawText(AppCtx_t*        app,
 void GfxDtor(AppCtx_t* app)
 {
     assert(app);
-
-    SDL_FreeSurface(app->screen_surface);
-    app->screen_surface = NULL;
 
     SDL_DestroyWindow(app->window);
     app->window = NULL;

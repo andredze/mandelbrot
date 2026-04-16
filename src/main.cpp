@@ -45,6 +45,8 @@ int main(int argc, char* argv[])
 
 	app.screen_surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0, 0, 0, 0);
 	
+	GetColorTable(&app);
+
 	MakeTests(&app);
 	
 	SDL_FreeSurface(app.screen_surface);

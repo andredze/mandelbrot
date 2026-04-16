@@ -24,8 +24,17 @@ const int SCALE_SCREEN_HEIGHT = 1;
 
 //------------------------------------------------------------------//
 
+#ifdef GRAPHICS
+const int SCREEN_WIDTH  = 1024 * 2;
+const int SCREEN_HEIGHT = 576 * 2;
+#else
 const int SCREEN_WIDTH  = 1024;
 const int SCREEN_HEIGHT = 576;
+#endif
+
+//------------------------------------------------------------------//
+
+const int SURFACE_PITCH = SCREEN_WIDTH * BYTES_PER_PIXEL;
 
 //------------------------------------------------------------------//
 
@@ -65,6 +74,10 @@ GfxErr_t;
 
 //------------------------------------------------------------------//
 
+const int MANDELBROT_MAX_ITERS = 100;
+
+//------------------------------------------------------------------//
+
 typedef struct AppCtx
 {
     bool            is_running;
@@ -88,6 +101,8 @@ typedef struct AppCtx
     int             fps_counter;
 
     uint64_t        tests_cycles[TESTS_COUNT];
+
+    Uint32          color_table[MANDELBROT_MAX_ITERS + 1];
 }
 AppCtx_t;
 
@@ -96,7 +111,7 @@ AppCtx_t;
 inline void __attribute__((always_inline)) 
 GfxPutPixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
 {
-    *(Uint32*)(((Uint8 *)surface->pixels) + y * surface->pitch + x * BYTES_PER_PIXEL) = pixel;
+    *(Uint32*)(((Uint8 *)surface->pixels) + y * SURFACE_PITCH + x * BYTES_PER_PIXEL) = pixel;
 }
 
 //------------------------------------------------------------------//

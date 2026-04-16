@@ -81,7 +81,7 @@ int main()
 
             double mean = (double) sum / count;
 
-            if (i == 0)
+            if (i == 0 && j == 0)
             {
                 baseline = mean;
             }

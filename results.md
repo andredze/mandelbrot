@@ -18,7 +18,7 @@ theoretical maximum = x16 speed<br> -->
 |Процессор                              | 11th Gen Intel(R) Core(TM) i5-11320H @ 3.20GHz|
 |Среднее время одного теста             | 1 минута                                      |
 |Количество тестов на 1 вид оптимизации | 7                                             |
-|Средняя температура процессора         | 55 °C                                         |
+|Средняя температура процессора         | 50 °C                                         |
 |Средняя частота процессора             | 2800 Ghz                                      |
 |Использованные опции компилятора       | `-O2`/`-O3`/`-O fast` и `-march=native`       |
 |Версия компилятора g++                 | 13.3.0                                        |
@@ -26,26 +26,28 @@ theoretical maximum = x16 speed<br> -->
 
 | Оптимизация               |    Среднее значение циклов  |  Стандартное отклонение  | Погрешность | Относительная погрешность, % |
 | ------------------------- | --------------------------- | ------------------------ | ------------|----------------------------- |
-| naive:  g++ -O2           |   4.16e+11   |  9.59e+06  |  3.63e+06 | 0.001 |
-| naive:  g++ -O3           |   4.16e+11   |  2.75e+07  |  1.04e+07 | 0.003 |
-| naive:  g++ -Ofast        |   4.12e+11   |  4.44e+07  |  1.68e+07 | 0.004 |
-| arrays: g++ -O2           |   3.42e+10   |  2.47e+07  |  9.34e+06 | 0.027 |
-| arrays: g++ -O3           |   1.93e+11   |  1.09e+08  |  4.14e+07 | 0.021 |
-| arrays: g++ -Ofast        |   1.96e+11   |  8.94e+06  |  3.38e+06 | 0.002 |
-| avx:    g++ -O2           |   2.83e+10   |  6.52e+06  |  2.47e+06 | 0.008 |
-| avx:    g++ -O3           |   2.83e+10   |  4.44e+06  |  1.68e+06 | 0.005 |
-| avx:    g++ -Ofast        |   2.83e+10   |  8.63e+06  |  3.26e+06 | 0.010 |
-| naive:  clang++ -O2       |   4.07e+11   |  4.92e+06  |  1.86e+06 | 0.000 |
-| naive:  clang++ -O3       |   4.07e+11   |  3.10e+07  |  1.17e+07 | 0.003 |
-| naive:  clang++ -Ofast    |   4.23e+11   |  8.64e+07  |  3.27e+07 | 0.008 |
-| arrays: clang++ -O2       |   2.85e+10   |  2.76e+08  |  1.04e+08 | 0.167 |
-| arrays: clang++ -O3       |   2.85e+10   |  9.32e+06  |  3.53e+06 | 0.006 |
-| arrays: clang++ -Ofast    |   2.83e+10   |  6.78e+06  |  2.57e+06 | 0.004 |
-| avx:    clang++ -O2       |   3.39e+10   |  5.62e+06  |  2.13e+06 | 0.006 |
-| avx:    clang++ -O3       |   3.39e+10   |  4.02e+06  |  1.52e+06 | 0.004 |
-| avx:    clang++ -Ofast    |   2.75e+10   |  6.65e+06  |  2.52e+06 | 0.009 |
+| naive:  g++ -O2           |   4.09e+11   |  8.05e+07  |  3.04e+07 | 0.007 |
+| naive:  g++ -O3           |   4.08e+11   |  4.80e+07  |  1.82e+07 | 0.004 |
+| naive:  g++ -Ofast        |   4.05e+11   |  1.38e+07  |  5.21e+06 | 0.001 |
+| arrays: g++ -O2           |   3.08e+10   |  2.60e+06  |  9.83e+05 | 0.003 |
+| arrays: g++ -O3           |   1.69e+11   |  8.29e+06  |  3.13e+06 | 0.002 |
+| arrays: g++ -Ofast        |   1.76e+11   |  1.18e+07  |  4.47e+06 | 0.003 |
+| avx:    g++ -O2           |   2.67e+10   |  4.58e+06  |  1.73e+06 | 0.006 |
+| avx:    g++ -O3           |   2.67e+10   |  3.07e+06  |  1.16e+06 | 0.004 |
+| avx:    g++ -Ofast        |   2.67e+10   |  1.89e+06  |  7.15e+05 | 0.003 |
+| naive:  clang++ -O2       |   3.98e+11   |  2.69e+07  |  1.02e+07 | 0.003 |
+| naive:  clang++ -O3       |   3.98e+11   |  5.75e+07  |  2.17e+07 | 0.005 |
+| naive:  clang++ -Ofast    |   4.16e+11   |  6.51e+07  |  2.46e+07 | 0.006 |
+| arrays: clang++ -O2       |   1.04e+11   |  1.55e+07  |  5.85e+06 | 0.006 |
+| arrays: clang++ -O3       |   1.05e+11   |  6.68e+06  |  2.53e+06 | 0.002 |
+| arrays: clang++ -Ofast    |   1.02e+11   |  1.74e+07  |  6.58e+06 | 0.006 |
+| avx:    clang++ -O2       |   2.88e+10   |  1.13e+07  |  4.27e+06 | 0.015 |
+| avx:    clang++ -O3       |   2.88e+10   |  1.19e+07  |  4.50e+06 | 0.016 |
+| avx:    clang++ -Ofast    |   2.32e+10   |  1.05e+07  |  3.95e+06 | 0.017 |
+
 
 ### Абсолютные значения
+
 
 <table>
   <thead>
@@ -53,13 +55,15 @@ theoretical maximum = x16 speed<br> -->
     <tr><th colspan="3">g++</th><th colspan="3">clang++</th></tr>
     <tr><th>-O2</th><th>-O3</th><th>-Ofast</th><th>-O2</th><th>-O3</th><th>-Ofast</th></tr></thead>
   <tbody>
-    <tr><td>naive</td><td>41.65</td><td>41.62</td><td>41.21</td><td>40.75</td><td>40.76</td><td>42.35</td></tr>
-    <tr><td>arrays</td><td>3.43</td><td>19.38</td><td>19.67</td><td>9.76</td><td>9.75</td><td>9.73</td></tr>
-    <tr><td>avx</td><td>2.84</td><td>2.83</td><td>2.84</td><td>3.40</td><td>3.40</td><td>2.75</td></tr>
+    <tr><td>naive</td><td>40.90</td><td>40.80</td><td>40.50</td><td>39.80</td><td>39.80</td><td>41.60</td></tr>
+    <tr><td>arrays</td><td>3.08</td><td>16.90</td><td>17.60</td><td>10.40</td><td>10.50</td><td>10.20</td></tr>
+    <tr><td>avx</td><td>2.67</td><td>2.67</td><td>2.67</td><td>2.88</td><td>2.88</td><td>2.32</td></tr>
   </tbody>
 </table>
 
+
 ### Отношение
+
 
 <table>
   <thead>
@@ -67,9 +71,9 @@ theoretical maximum = x16 speed<br> -->
     <tr><th colspan="3">g++</th><th colspan="3">clang++</th></tr>
     <tr><th>-O2</th><th>-O3</th><th>-Ofast</th><th>-O2</th><th>-O3</th><th>-Ofast</th></tr></thead>
   <tbody>
-    <tr><td>naive</td><td>1.00</td><td>1.00</td><td>1.01</td><td>1.00</td><td>1.00</td><td>0.96</td></tr>
-    <tr><td>arrays</td><td>12.15</td><td>2.15</td><td>2.12</td><td>3.90</td><td>3.93</td><td>4.03</td></tr>
-    <tr><td>avx</td><td>15.22</td><td>15.23</td><td>15.27</td><td>14.14</td><td>14.16</td><td>14.79</td></tr>
+    <tr><td>naive</td><td>1.00</td><td>1.00</td><td>1.01</td><td>1.03</td><td>1.03</td><td>0.98</td></tr>
+    <tr><td>arrays</td><td>13.25</td><td>2.42</td><td>2.33</td><td>3.92</td><td>3.90</td><td>4.01</td></tr>
+    <tr><td>avx</td><td>15.30</td><td>15.30</td><td>15.32</td><td>14.18</td><td>14.18</td><td>17.62</td></tr>
   </tbody>
 </table>
 
@@ -109,8 +113,8 @@ SIMD-инструкциями. -->
 ## clang++ O2 (arrays version)
 <table>
 <tr>
-<td><img src="assets/clang_-O2_arrays.png"></td>
-<td><img src="assets/clang_-O2_arrays_spam.png"></td>
+<td><img src="assets/is_stable_mask_clang_arrays.png"></td>
+<td><img src="assets/end_clang_arrays.png" width = 75%></td>
 </tr>
 </table>
 
@@ -145,9 +149,7 @@ SIMD-инструкциями. -->
     <img src="assets/no_throttle_proof.png" width="75%">
 </p>
 
-
 <!-- Температура при тестах не поднималась выше 60 градусов, что говорит об отсутствии троттлинга на производительность процессора. -->
-
 
 <p align="center">
     <img src="data/temp.png" width="75%">
@@ -210,6 +212,22 @@ SIMD-инструкциями. -->
 
 <p align="center">
     <img src="assets/fmadd_regs.png" width="75%">
+</p>
+
+### clang++ -Ofast
+Дизассемблированный код функций MandelbrotIntrinsics512 и MakeTests абсолютно одинаков
+
+<p align="center">
+    <img src="assets/objdump_same1.png" width="75%">
+</p>
+
+
+<p align="center">
+    <img src="assets/set_fast_math.png" width="75%">
+</p>
+
+<p align="center">
+    <img src="assets/mxcsr.png" width="75%">
 </p>
 
 
