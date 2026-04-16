@@ -154,7 +154,25 @@ SIMD-инструкциями. -->
 <p align="center">
     <img src="data/temp.png" width="75%">
 </p>
-<!-- 
+
+### clang++ -Ofast
+Дизассемблированный код функций MandelbrotIntrinsics512 и MakeTests абсолютно одинаков
+
+<p align="center">
+    <img src="assets/objdump_same1.png" width="75%">
+</p>
+
+
+<p align="center">
+    <img src="assets/set_fast_math.png" width="75%">
+</p>
+
+<p align="center">
+    <img src="assets/mxcsr.png" width="75%">
+</p>
+
+
+<!-- <!-- 
 Проанализировав код с помощью gobolt.org, я обнаружил, что в теле цикла происходит много обращений в память,
 там, где, казалось бы, можно использовать регистры. 
 В памяти хранились различные константы и сдвиги по типу mm_x_increment, mm_delta_x_0to15, 
@@ -180,18 +198,18 @@ SIMD-инструкциями. -->
 <!-- и начал использовать для них регистры. -->
 
 <!-- Однако осталось еще одно обращение в память в теле вложенного цикла. Оно происходит в инструкции `vfmadd132ss` (.LC4[rip]). -->
-```c
+<!-- ```c
   __m512 mm_y_start = _mm512_set1_ps(app->center_point_y + app->y_zoom_scale * ((float) pixel_y * (1.0f / SCREEN_HEIGHT) - 0.5f));
-```
-<p align="center">
+``` -->
+<!-- <p align="center">
     <img src="assets/fmadd_memory.png" width="75%">
-</p>
+</p> -->
 
 <!-- Нажав в godbolt Scroll to source, увидим, что это скомпилированная следующая строка: -->
 
-```c
+<!-- ```c
   __m512 mm_y_start = _mm512_set1_ps(y_adding + y_coeff * (float) pixel_y);
-```
+``` -->
 
 <!-- И да, пройдя по метке .LC4 убедимся, что это и есть константа (1.0f / SCREEN_HEIGHT). -->
 <!-- Однако это вычисление можно упростить, так как в ходе цикла меняется только переменная pixel_y. -->
@@ -201,33 +219,16 @@ SIMD-инструкциями. -->
 <!-- Вычисление начальной координаты y_start: -->
 
 <!-- Вычисление констант в начале функции: -->
-```c
+<!-- ```c
   float y_coeff = (1.0f / SCREEN_HEIGHT) * app->y_zoom_scale;
   float y_adding = app->y_zoom_scale * (-0.5f) + app->center_point_y; 
-```
+``` -->
 
 <!-- Убедимся, что оптимизация успешна, и компилятор использует исключительно регистры в инструкции `vfmadd132ss` -->
 
 
 
-<p align="center">
+<!-- <p align="center">
     <img src="assets/fmadd_regs.png" width="75%">
 </p>
-
-### clang++ -Ofast
-Дизассемблированный код функций MandelbrotIntrinsics512 и MakeTests абсолютно одинаков
-
-<p align="center">
-    <img src="assets/objdump_same1.png" width="75%">
-</p>
-
-
-<p align="center">
-    <img src="assets/set_fast_math.png" width="75%">
-</p>
-
-<p align="center">
-    <img src="assets/mxcsr.png" width="75%">
-</p>
-
-
+ -->
